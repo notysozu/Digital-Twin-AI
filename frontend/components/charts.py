@@ -220,8 +220,17 @@ def plot_scenario_scores_compare(scen_a: Dict[str, Any], scen_b: Dict[str, Any])
     
     categories = ['Wellbeing (Health Index)', 'Focus & Study Index']
     
-    scores_a = [scen_a["health_index"], scen_a["focus_index"]]
-    scores_b = [scen_b["health_index"], scen_b["focus_index"]]
+    def get_avg_score(scen: Dict[str, Any], key: str) -> float:
+        if key in scen:
+            return float(scen[key])
+        datapoints = scen.get("datapoints", [])
+        if not datapoints:
+            return 0.0
+        return sum(float(dp.get(key, 0.0)) for dp in datapoints) / len(datapoints)
+    
+    scores_a = [get_avg_score(scen_a, "health_index"), get_avg_score(scen_a, "focus_index")]
+    scores_b = [get_avg_score(scen_b, "health_index"), get_avg_score(scen_b, "focus_index")]
+
     
     fig.add_trace(go.Bar(
         name='Scenario A',
