@@ -218,7 +218,7 @@ if api_online:
                 amount = st.number_input("Amount ($)", min_value=0.01, step=10.0)
                 record_date = st.date_input("Date", value=datetime.today())
                 
-                submitted = st.form_submit_form()
+                submitted = st.form_submit_button("Submit Financial Record")
                 if submitted:
                     new_rec = {
                         "category": category,
@@ -295,7 +295,7 @@ if api_online:
                     impact = st.slider("Subjective Wellbeing / Energy Score", min_value=1, max_value=10, value=5)
                     log_date = st.date_input("Log Date", value=datetime.today())
                     
-                    sub = st.form_submit_form()
+                    sub = st.form_submit_button("Submit Habit Record")
                     if sub:
                         data = {
                             "habit_name": h_name,
@@ -316,7 +316,7 @@ if api_online:
                     exam_sc = st.number_input("Exam Score (Optional, %)", min_value=0.0, max_value=100.0, value=None)
                     log_date_s = st.date_input("Session Date", value=datetime.today())
                     
-                    sub_s = st.form_submit_form()
+                    sub_s = st.form_submit_button("Submit Study Session")
                     if sub_s:
                         data = {
                             "subject": subject,
