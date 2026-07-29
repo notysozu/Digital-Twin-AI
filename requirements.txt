@@ -11,3 +11,4 @@ python-dotenv>=1.0.0
 httpx>=0.24.1
 google-generativeai>=0.3.0
 email-validator>=2.0.0
+groq>=0.4.0

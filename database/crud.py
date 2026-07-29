@@ -1,6 +1,7 @@
 import random
 from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
+from typing import Any
 from . import models, schemas
 
 # User operations
@@ -242,3 +243,73 @@ def seed_mock_data(db: Session, user_id: int):
 
     db.commit()
     print("Seed complete.")
+
+
+# Single-item CRUD helpers for finance, habit, and study records
+def get_financial_record(db: Session, record_id: int):
+    return db.query(models.FinancialRecord).filter(models.FinancialRecord.id == record_id).first()
+
+def update_financial_record(db: Session, record_id: int, record_update: Any):
+    db_record = get_financial_record(db, record_id)
+    if not db_record:
+        return None
+    db_record.category = record_update.category
+    db_record.description = record_update.description
+    db_record.amount = record_update.amount
+    db.commit()
+    db.refresh(db_record)
+    return db_record
+
+def delete_financial_record(db: Session, record_id: int):
+    db_record = get_financial_record(db, record_id)
+    if not db_record:
+        return False
+    db.delete(db_record)
+    db.commit()
+    return True
+
+def get_habit_record(db: Session, habit_id: int):
+    return db.query(models.HabitRecord).filter(models.HabitRecord.id == habit_id).first()
+
+def update_habit_record(db: Session, habit_id: int, habit_update: Any):
+    db_record = get_habit_record(db, habit_id)
+    if not db_record:
+        return None
+    db_record.habit_name = habit_update.habit_name
+    db_record.duration_minutes = habit_update.duration_minutes
+    db_record.impact_score = habit_update.impact_score
+    db.commit()
+    db.refresh(db_record)
+    return db_record
+
+def delete_habit_record(db: Session, habit_id: int):
+    db_record = get_habit_record(db, habit_id)
+    if not db_record:
+        return False
+    db.delete(db_record)
+    db.commit()
+    return True
+
+def get_study_record(db: Session, record_id: int):
+    return db.query(models.StudyRecord).filter(models.StudyRecord.id == record_id).first()
+
+def update_study_record(db: Session, record_id: int, study_update: Any):
+    db_record = get_study_record(db, record_id)
+    if not db_record:
+        return None
+    db_record.subject = study_update.subject
+    db_record.duration_minutes = study_update.duration_minutes
+    db_record.focus_score = study_update.focus_score
+    db_record.exam_score = study_update.exam_score
+    db.commit()
+    db.refresh(db_record)
+    return db_record
+
+def delete_study_record(db: Session, record_id: int):
+    db_record = get_study_record(db, record_id)
+    if not db_record:
+        return False
+    db.delete(db_record)
+    db.commit()
+    return True
+

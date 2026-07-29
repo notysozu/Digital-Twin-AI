@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from database.database import engine
 from database.models import Base
 from database.crud import seed_mock_data
-from backend.api import users, records, simulations
+from backend.api import users, records, simulations, finance, habits, study
 from database.database import SessionLocal
 
 Base.metadata.create_all(bind=engine)
@@ -34,6 +34,9 @@ def startup_event():
 app.include_router(users.router)
 app.include_router(records.router)
 app.include_router(simulations.router)
+app.include_router(finance.router)
+app.include_router(habits.router)
+app.include_router(study.router)
 
 @app.get("/")
 def read_root():

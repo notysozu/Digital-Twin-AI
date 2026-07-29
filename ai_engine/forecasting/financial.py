@@ -1,106 +1,107 @@
-# import numpy as np
-# import pandas as pd
-# from typing import Dict, List, Any
+import numpy as np
+import pandas as pd
+from typing import Dict, List, Any
 
-# def run_deterministic_projection(
-#     current_age: int,
-#     retirement_age: int,
-#     current_net_worth: float,
-#     monthly_savings: float,
-#     annual_return_rate: float = 0.07,
-#     annual_inflation_rate: float = 0.025
-# ) -> List[Dict[str, Any]]:
-#     """
-#     Project future net worth year-by-year based on fixed annual returns.
-#     """
-#     real_return_rate = (1 + annual_return_rate) / (1 + annual_inflation_rate) - 1
-#     years_to_project = max(1, retirement_age - current_age)
+def run_deterministic_projection(
+    current_age: int,
+    retirement_age: int,
+    current_net_worth: float,
+    monthly_savings: float,
+    annual_return_rate: float = 0.07,
+    annual_inflation_rate: float = 0.025
+) -> List[Dict[str, Any]]:
+    """
+    Project future net worth year-by-year based on fixed annual returns.
+    """
+    real_return_rate = (1 + annual_return_rate) / (1 + annual_inflation_rate) - 1
+    years_to_project = max(1, retirement_age - current_age)
     
-#     datapoints = []
-#     net_worth = current_net_worth
+    datapoints = []
+    net_worth = current_net_worth
     
-#     # Year 0 (Current status)
-#     datapoints.append({
-#         "year": 0,
-#         "age": current_age,
-#         "net_worth": round(net_worth, 2)
-#     })
+    # Year 0 (Current status)
+    datapoints.append({
+        "year": 0,
+        "age": current_age,
+        "net_worth": round(net_worth, 2)
+    })
     
-#     for y in range(1, years_to_project + 1):
-#         # Compound the existing net worth
-#         net_worth = net_worth * (1 + real_return_rate)
-#         # Add annual savings (compounded monthly, simplified to annual addition at end of year)
-#         # For a closer approximation:
-#         for _ in range(12):
-#             net_worth += monthly_savings * ((1 + real_return_rate / 12) ** 1)
+    for y in range(1, years_to_project + 1):
+        # Compound the existing net worth
+        net_worth = net_worth * (1 + real_return_rate)
+        # Add annual savings (compounded monthly, simplified to annual addition at end of year)
+        # For a closer approximation:
+        for _ in range(12):
+            net_worth += monthly_savings * ((1 + real_return_rate / 12) ** 1)
         
-#         datapoints.append({
-#             "year": y,
-#             "age": current_age + y,
-#             "net_worth": round(net_worth, 2)
-#         })
+        datapoints.append({
+            "year": y,
+            "age": current_age + y,
+            "net_worth": round(net_worth, 2)
+        })
         
-#     return datapoints
+    return datapoints
 
-# def run_monte_carlo_simulation(
-#     current_age: int,
-#     retirement_age: int,
-#     current_net_worth: float,
-#     monthly_savings: float,
-#     mean_return: float = 0.08,
-#     std_dev: float = 0.15,
-#     annual_inflation_rate: float = 0.025,
-#     num_simulations: int = 500
-# ) -> Dict[str, Any]:
-#     """
-#     Run Monte Carlo simulations of net worth over time.
-#     Returns median, 10th percentile, and 90th percentile trajectories,
-#     as well as the probability of reaching a target net worth.
-#     """
-#     years = max(1, retirement_age - current_age)
+def run_monte_carlo_simulation(
+    current_age: int,
+    retirement_age: int,
+    current_net_worth: float,
+    monthly_savings: float,
+    mean_return: float = 0.08,
+    std_dev: float = 0.15,
+    annual_inflation_rate: float = 0.025,
+    num_simulations: int = 500
+) -> Dict[str, Any]:
+    """
+    Run Monte Carlo simulations of net worth over time.
+    Returns median, 10th percentile, and 90th percentile trajectories,
+    as well as the probability of reaching a target net worth.
+    """
+    years = max(1, retirement_age - current_age)
     
-#     # Array to store all simulation paths: [num_simulations, years + 1]
-#     paths = np.zeros((num_simulations, years + 1))
-#     paths[:, 0] = current_net_worth
+    # Array to store all simulation paths: [num_simulations, years + 1]
+    paths = np.zeros((num_simulations, years + 1))
+    paths[:, 0] = current_net_worth
     
-#     # Generate random real returns for all simulations and all years
-#     # real_return = (1 + nominal_return) / (1 + inflation) - 1
-#     # We will generate nominal returns as normal variables, then compute real returns
-#     nominal_returns = np.random.normal(mean_return, std_dev, (num_simulations, years))
-#     real_returns = (1 + nominal_returns) / (1 + annual_inflation_rate) - 1
+    # Generate random real returns for all simulations and all years
+    # real_return = (1 + nominal_return) / (1 + inflation) - 1
+    # We will generate nominal returns as normal variables, then compute real returns
+    nominal_returns = np.random.normal(mean_return, std_dev, (num_simulations, years))
+    real_returns = (1 + nominal_returns) / (1 + annual_inflation_rate) - 1
     
-#     for y in range(1, years + 1):
-#         prev_value = paths[:, y - 1]
-#         year_real_return = real_returns[:, y - 1]
+    for y in range(1, years + 1):
+        prev_value = paths[:, y - 1]
+        year_real_return = real_returns[:, y - 1]
         
-#         # Compound previous year's value
-#         compounded = prev_value * (1 + year_real_return)
+        # Compound previous year's value
+        compounded = prev_value * (1 + year_real_return)
         
-#         # Add monthly savings compounded monthly
-#         # Simplified: add monthly savings and compound for the rest of the year
-#         added_savings = np.zeros(num_simulations)
-#         for m in range(12):
-#             added_savings += monthly_savings * ((1 + year_real_return / 12) ** (12 - m - 1))
+        # Add monthly savings compounded monthly
+        # Simplified: add monthly savings and compound for the rest of the year
+        added_savings = np.zeros(num_simulations)
+        for m in range(12):
+            added_savings += monthly_savings * ((1 + year_real_return / 12) ** (12 - m - 1))
             
-#         paths[:, y] = compounded + added_savings
-#         # Clip negative net worths to 0 to prevent runaway debt in simulation (optional, but standard for assets)
-#         paths[:, y] = np.clip(paths[:, y], a_min=0, a_max=None)
+        paths[:, y] = compounded + added_savings
+        # Clip negative net worths to 0 to prevent runaway debt in simulation (optional, but standard for assets)
+        paths[:, y] = np.clip(paths[:, y], a_min=0, a_max=None)
         
-#     # Calculate statistics
-#     median_path = np.percentile(paths, 50, axis=0)
-#     p10_path = np.percentile(paths, 10, axis=0)
-#     p90_path = np.percentile(paths, 90, axis=0)
+    # Calculate statistics
+    median_path = np.percentile(paths, 50, axis=0)
+    p10_path = np.percentile(paths, 10, axis=0)
+    p90_path = np.percentile(paths, 90, axis=0)
     
-#     results = {
-#         "years": list(range(years + 1)),
-#         "ages": [current_age + y for y in range(years + 1)],
-#         "median": [round(val, 2) for val in median_path],
-#         "p10": [round(val, 2) for val in p10_path],
-#         "p90": [round(val, 2) for val in p90_path],
-#         "final_values": [round(val, 2) for val in paths[:, -1]]
-#     }
+    results = {
+        "years": list(range(years + 1)),
+        "ages": [current_age + y for y in range(years + 1)],
+        "median": [round(val, 2) for val in median_path],
+        "p10": [round(val, 2) for val in p10_path],
+        "p90": [round(val, 2) for val in p90_path],
+        "final_values": [round(val, 2) for val in paths[:, -1]]
+    }
     
-#     return results
+    return results
+
 """
 ai_engine/forecasting/financial.py
 
