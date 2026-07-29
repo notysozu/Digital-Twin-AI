@@ -251,7 +251,7 @@ if api_online:
             if records:
                 df = pd.DataFrame(records)
                 # Select columns and clean names
-                df["Date"] = pd.to_datetime(df["record_date"]).dt.strftime('%Y-%m-%d')
+                df["Date"] = pd.to_datetime(df["record_date"], format="ISO8601", errors="coerce").dt.strftime('%Y-%m-%d')
                 df_show = df[["Date", "category", "description", "amount"]].rename(
                     columns={"category": "Category", "description": "Description", "amount": "Amount ($)"}
                 )
@@ -341,7 +341,7 @@ if api_online:
                 h_recs = api_client.get_records(user_id, "habit", limit=20)
                 if h_recs:
                     df_h = pd.DataFrame(h_recs)
-                    df_h["Date"] = pd.to_datetime(df_h["created_at"]).dt.strftime('%m-%d %H:%M')
+                    df_h["Date"] = pd.to_datetime(df_h["created_at"], format="ISO8601", errors="coerce").dt.strftime('%m-%d %H:%M')
                     st.dataframe(
                         df_h[["Date", "habit_name", "duration_minutes", "impact_score"]].rename(
                             columns={"habit_name":"Habit", "duration_minutes":"Duration (min)", "impact_score":"Impact Score"}
@@ -356,7 +356,7 @@ if api_online:
                 s_recs = api_client.get_records(user_id, "study", limit=20)
                 if s_recs:
                     df_s = pd.DataFrame(s_recs)
-                    df_s["Date"] = pd.to_datetime(df_s["created_at"]).dt.strftime('%m-%d %H:%M')
+                    df_s["Date"] = pd.to_datetime(df_s["created_at"], format="ISO8601", errors="coerce").dt.strftime('%m-%d %H:%M')
                     st.dataframe(
                         df_s[["Date", "subject", "duration_minutes", "focus_score"]].rename(
                             columns={"subject":"Subject", "duration_minutes":"Duration (min)", "focus_score":"Focus Rating"}
