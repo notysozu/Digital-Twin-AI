@@ -1,21 +1,20 @@
 # Digital Twin AI – Personal Life Simulation & Decision Assistant
 
 ## AI Assistant Context
-**Project Goal:** Build an intelligent decision-support system that creates a "digital twin" of a user to forecast future outcomes of their choices (finances, habits, studies) using predictive analytics, ML, and LLMs.
-**Architecture Style:** Decoupled microservices/monorepo. 
-**Primary Languages:** Python, SQL.
+**Project Goal:** Build an intelligent decision-support system that creates a "digital twin" of a user to forecast future life outcomes of their choices (finances, habits, studies) using predictive analytics, machine learning, and LLM advice.
+**Architecture Style:** Decoupled frontend/backend monorepo.
 
 ## Tech Stack
-* **Frontend / Visualization:** Streamlit (Python), Plotly
-* **Backend / API Routing:** FastAPI (Python), Uvicorn
-* **Database:** SQLite (default / local fallback `digital_twin.db`) or PostgreSQL (SQLAlchemy ORM)
-* **AI & Machine Learning:** Scikit-learn, Pandas, Large Language Models (Gemini / Groq API)
+* **Frontend Client:** React 19, TypeScript, Vite, TanStack Router & Start, Tailwind CSS, Radix UI, Recharts.
+* **Backend API Server:** FastAPI (Python), Uvicorn.
+* **Database:** PostgreSQL or SQLite (SQLAlchemy ORM).
+* **AI & Predictive Engines:** Scikit-learn, Pandas, Gemini & Groq LLM Advisors.
 
 ---
 
 ## 🚀 Getting Started
 
-### 1. Environment Setup
+### 1. Backend Environment Setup
 
 Clone the repository and set up a Python virtual environment:
 
@@ -30,9 +29,19 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 2. Environment Variables Configuration
+### 2. Frontend Environment Setup
 
-Copy `.env.example` to `.env` (or create a `.env` file in the root directory) and set your configuration options:
+Ensure you have Node.js installed, then install frontend dependencies:
+
+```bash
+cd frontend
+npm install
+cd ..
+```
+
+### 3. Environment Variables Configuration
+
+Create a `.env` file in the root directory and set your configuration options:
 
 ```env
 DATABASE_URL=sqlite:///./digital_twin.db
@@ -44,33 +53,30 @@ GROQ_API_KEY=your_groq_api_key_here
 
 ## 🏃 Running the Application
 
-The application consists of a **FastAPI backend API** and a **Streamlit frontend dashboard**. You can run both concurrently in separate terminal sessions.
+The application consists of a **FastAPI backend API** and a **React Vite frontend**. You can run both concurrently in separate terminal sessions.
 
 ### Start Backend API (FastAPI)
 
 ```bash
-# Activate virtual environment first
+# Activate virtual environment
 source .venv/bin/activate
 
 # Launch uvicorn server
-uvicorn backend.main:app --host 127.0.0.1 --port 8000 --reload
+uvicorn backend.main:app --host 127.0.0.1 --port 8000
 ```
 
 - **Backend Base URL:** [http://127.0.0.1:8000](http://127.0.0.1:8000)
 - **Health Check Endpoint:** [http://127.0.0.1:8000/health](http://127.0.0.1:8000/health)
 - **Interactive OpenAPI Docs:** [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 
-### Start Frontend Dashboard (Streamlit)
+### Start Frontend Client (Vite React)
 
 ```bash
-# Activate virtual environment first
-source .venv/bin/activate
-
-# Launch Streamlit app
-streamlit run frontend/app.py --server.port 8501
+cd frontend
+npm run dev
 ```
 
-- **Frontend Dashboard URL:** [http://localhost:8501](http://localhost:8501)
+- **Frontend Client URL:** [http://localhost:8080](http://localhost:8080)
 
 ---
 
@@ -79,13 +85,17 @@ streamlit run frontend/app.py --server.port 8501
 ```text
 digital-twin-ai/
 │
-├── frontend/                 # Streamlit dashboard and UI components
-│   ├── app.py                # Main Streamlit entry point
-│   └── components/           # Reusable UI widgets and charts
+├── frontend/                 # React, TypeScript and Vite client
+│   ├── src/
+│   │   ├── routes/           # Routing tree (Landing, Dashboard, Simulator, Setup, Tasks)
+│   │   ├── components/       # App Shell, Settings Dialog, charts, and Radix widgets
+│   │   └── lib/              # API Client (api.ts) & Central State Provider (twin-store.tsx)
+│   ├── package.json          # Node dependencies and build scripts
+│   └── vite.config.ts        # Vite environment configs
 │
 ├── backend/                  # FastAPI server and route handlers
 │   ├── main.py               # FastAPI application instance
-│   ├── api/                  # API endpoints (users, records, simulations, finance, habits, study)
+│   ├── api/                  # API routers (users, records, simulations, finance, habits, study)
 │   ├── config/               # App configuration
 │   └── services/             # Business logic and external API calls
 │
@@ -98,7 +108,7 @@ digital-twin-ai/
 ├── ai_engine/                # Machine learning and simulation logic
 │   ├── forecasting/          # Financial and study predictive models
 │   ├── simulation/           # Multi-scenario "what-if" simulation logic
-│   └── llm_integration/      # Conversational AI prompt handling
+│   └── llm_integration/      # Conversational AI advisor prompt handling
 │
 ├── requirements.txt          # Python dependencies
 └── .env.example              # Environment variables template
@@ -112,9 +122,13 @@ digital-twin-ai/
 | :--- | :--- | :--- |
 | `/` | `GET` | API root status check |
 | `/health` | `GET` | Health check endpoint |
-| `/users/` | `GET / POST / PUT` | Manage user profiles and baseline metrics |
-| `/records/` | `GET` | Retrieve combined user activity logs |
-| `/simulations/` | `POST` | Execute multi-scenario digital twin simulations |
-| `/finance/` | `GET / POST` | Financial record tracking & budget overview |
-| `/habits/` | `GET / POST` | Daily habit tracking & wellness impact metrics |
-| `/study/` | `GET / POST` | Study focus time tracking & performance correlation |
+| `/users/` | `POST` | Create a new user profile |
+| `/users/{user_id}` | `PUT` | Update user settings/metrics |
+| `/users/username/{username}` | `GET` | Retrieve user profile by username |
+| `/users/email/{email}` | `GET` | Retrieve user profile by email |
+| `/records/habit/{user_id}` | `GET / POST` | Log/get habit duration & wellness impact records |
+| `/records/study/{user_id}` | `GET / POST` | Log/get study duration & focus performance records |
+| `/records/financial/{user_id}` | `GET / POST` | Log/get financial transaction ledger records |
+| `/simulations/baseline/{user_id}` | `GET` | Compute user's average baseline parameters |
+| `/simulations/forecast/{user_id}` | `GET` | Generate deterministic net worth forecast |
+| `/simulations/compare/{user_id}` | `POST` | Execute multi-scenario What-If simulations & AI recommendations |
