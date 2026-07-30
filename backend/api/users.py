@@ -66,3 +66,25 @@ def update_user(
         raise HTTPException(status_code=404, detail="User not found")
 
     return db_user
+
+
+@router.get("/username/{username}", response_model=schemas.UserResponse)
+def get_user_by_username(username: str, db: Session = Depends(database.get_db)):
+    """
+    Get user details by username for login/lookup.
+    """
+    user = crud.get_user_by_username(db, username=username)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
+
+
+@router.get("/email/{email}", response_model=schemas.UserResponse)
+def get_user_by_email(email: str, db: Session = Depends(database.get_db)):
+    """
+    Get user details by email for login/lookup.
+    """
+    user = crud.get_user_by_email(db, email=email)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
